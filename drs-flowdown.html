@@ -1,0 +1,304 @@
+<title>ANDES DRS requirement flow-down</title>
+<meta name="description" content="The 14 requirements linked to the SW DRS work package, traced through their derivation chains to the source documents.">
+<style>
+  :root {
+    --paper: #f4f5f1;
+    --card: #ffffff;
+    --ink: #20262c;
+    --muted: #626b74;
+    --line: #d8dcd3;
+    --edge: #97a0a8;
+    --trs: #2e5fa3;
+    --ins: #a06722;
+    --wp-bg: #232e33;
+    --wp-text: #e8ece6;
+  }
+  html { background: var(--paper); }
+  body {
+    font-family: "Avenir Next", "Segoe UI", system-ui, sans-serif;
+    color: var(--ink);
+    margin: 0;
+    line-height: 1.45;
+  }
+  .mono { font-family: ui-monospace, "SF Mono", Menlo, monospace; }
+
+  header { max-width: 1200px; margin: 0 auto; padding: 44px 28px 8px; }
+  .eyebrow {
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin: 0 0 10px;
+  }
+  h1 {
+    font-size: 30px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    margin: 0 0 10px;
+    text-wrap: balance;
+  }
+  .sub { max-width: 62ch; color: var(--muted); font-size: 15px; margin: 0 0 20px; }
+  .sub strong { color: var(--ink); font-weight: 600; }
+
+  .stats { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 6px; }
+  .stat {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 3px;
+    padding: 7px 14px;
+    font-size: 13px;
+    color: var(--muted);
+  }
+  .stat b {
+    color: var(--ink);
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    margin-right: 2px;
+  }
+
+  .legend {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 10px 28px 18px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 26px;
+    font-size: 12.5px;
+    color: var(--muted);
+    align-items: center;
+  }
+  .key { display: inline-flex; align-items: center; gap: 8px; }
+  .swatch { width: 11px; height: 11px; border-radius: 2px; display: inline-block; }
+  .ln { width: 34px; height: 0; border-top: 2px solid var(--edge); display: inline-block; }
+  .ln.dotted { border-top-style: dotted; }
+  .ln.dashed { border-top-style: dashed; }
+
+  .scroll { overflow-x: auto; padding: 0 12px 30px; }
+  .grid {
+    display: grid;
+    grid-template-columns: 1fr 40px 1fr 40px 1fr 40px 158px;
+    grid-auto-flow: row;
+    min-width: 1060px;
+    max-width: 1240px;
+    margin: 0 auto;
+    padding: 0 16px;
+  }
+
+  .lvl {
+    font-size: 10.5px;
+    letter-spacing: 0.13em;
+    text-transform: uppercase;
+    color: var(--muted);
+    padding: 6px 2px 10px;
+    border-bottom: 1px solid var(--line);
+    align-self: end;
+  }
+  .lvl.c1 { grid-column: 1; }
+  .lvl.c3 { grid-column: 3; }
+  .lvl.c5 { grid-column: 5; }
+  .lvl.c7 { grid-column: 7; grid-row: 1; padding-left: 14px; }
+
+  .ghead {
+    grid-column: 1 / 7;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink);
+    padding: 26px 0 10px;
+  }
+
+  .card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 3px;
+    padding: 10px 13px 11px;
+    margin: 7px 0;
+    font-size: 12.5px;
+    align-self: center;
+    width: 100%;
+    box-sizing: border-box;
+  }
+  .card p { margin: 5px 0 0; color: #3a424b; }
+  .card .rid {
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+    font-size: 12px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+  }
+  .card.trs .rid { color: var(--trs); }
+  .card.ins .rid { color: var(--ins); }
+  .card .note {
+    display: block;
+    margin-top: 6px;
+    font-size: 11px;
+    color: var(--muted);
+    font-style: italic;
+  }
+  .span3 { grid-row: span 3; }
+
+  /* connectors: horizontal line + arrowhead, drawn at the cell's vertical center */
+  .conn { position: relative; }
+  .conn::before {
+    content: "";
+    position: absolute;
+    left: 0; right: 5px; top: 50%;
+    border-top: 2px solid var(--edge);
+  }
+  .conn::after {
+    content: "";
+    position: absolute;
+    right: 0;
+    top: 50%;
+    margin-top: -4.5px;
+    border-left: 7px solid var(--edge);
+    border-top: 4.5px solid transparent;
+    border-bottom: 4.5px solid transparent;
+  }
+  .conn.dashed::before { border-top-style: dashed; }
+  .conn em {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -190%);
+    font-style: normal;
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+    font-size: 10px;
+    color: var(--muted);
+    white-space: nowrap;
+    background: var(--paper);
+    padding: 0 4px;
+  }
+  .conn.direct { grid-column: 2 / 7; }
+
+  /* branch: trunk + per-row horizontal segments for the R-INS-896 subtree */
+  .conn.branch::before { left: 50%; border-top-style: dotted; }
+  .conn.branch::after { display: none; }
+  .conn.branch .ah {
+    position: absolute;
+    right: 0; top: 50%;
+    margin-top: -4.5px;
+    border-left: 7px solid var(--edge);
+    border-top: 4.5px solid transparent;
+    border-bottom: 4.5px solid transparent;
+  }
+  .conn.branch .v {
+    position: absolute;
+    left: calc(50% - 1px);
+    border-left: 2px dotted var(--edge);
+  }
+  .branch.btop .v { top: 50%; bottom: 0; }
+  .branch.bmid .v { top: 0; bottom: 0; }
+  .branch.bbot .v { top: 0; height: 50%; }
+  .branch.bmid::after {
+    display: block;
+    content: "";
+    position: absolute;
+    left: 0; right: 50%; top: 50%;
+    border-top: 2px dotted var(--edge);
+    border-left: none; border-bottom: none;
+    margin: 0;
+  }
+
+  .wp {
+    grid-column: 7;
+    grid-row: 2 / 18;
+    background: var(--wp-bg);
+    color: var(--wp-text);
+    border-radius: 3px;
+    margin: 7px 0 7px 0;
+    padding: 16px 15px;
+  }
+  .wp .inner { position: sticky; top: 34vh; }
+  .wp .wbs {
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #93a49b;
+    margin: 0 0 8px;
+  }
+  .wp h2 { font-size: 17px; font-weight: 600; margin: 0 0 6px; }
+  .wp p { font-size: 12px; color: #b8c2ba; margin: 0 0 10px; }
+  .wp .count {
+    font-size: 12px;
+    color: var(--wp-text);
+    border-top: 1px solid #3d4a47;
+    padding-top: 10px;
+    font-variant-numeric: tabular-nums;
+  }
+
+  footer {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 6px 28px 48px;
+    font-size: 12.5px;
+    color: var(--muted);
+    max-width: 78ch;
+  }
+  footer p { margin: 0 0 8px; }
+  footer .mono { font-size: 11.5px; }
+</style>
+
+<header>
+  <p class="eyebrow">ANDES &middot; extracted from ANDES_model.mdzip (Cameo / MagicDraw XMI)</p>
+  <h1>Requirements on the Data Reduction Software work package</h1>
+  <p class="sub">All <strong>14 requirements</strong> linked to the <strong>SW DRS</strong> work package
+  in the model's WBS, traced upward through their derivation chains to the two source documents
+  they flow down from. Reading direction: document requirement &rarr; SW-level derivation &rarr;
+  DRS-level requirement &rarr; work package.</p>
+  <div class="stats">
+    <div class="stat"><b>14</b> linked requirements</div>
+    <div class="stat"><b>10</b> reached via flow-down chains</div>
+    <div class="stat"><b>4</b> apply directly from the document</div>
+    <div class="stat"><b>2</b> source documents</div>
+  </div>
+</header>
+
+<div class="legend">
+  <span class="key"><span class="swatch" style="background:var(--trs)"></span>ANDES Technical Requirements Specification</span>
+  <span class="key"><span class="swatch" style="background:var(--ins)"></span>Common Requirements for ELT Instruments</span>
+  <span class="key"><span class="ln"></span>DeriveReqt</span>
+  <span class="key"><span class="ln dotted"></span>containment</span>
+  <span class="key"><span class="ln dashed"></span>implied by naming</span>
+</div>
+
+<div class="scroll">
+<div class="grid">
+<div class="lvl c1">Document requirement</div><div class="lvl c3">SW-level flow-down</div><div class="lvl c5">DRS-level requirement</div><div class="lvl c7">Work package</div>
+<div class="ghead">ANDES Technical Requirements Specification &mdash; ESO-published, architect flow-down</div>
+<div class="card trs"><span class="rid">[R-AND-65]</span><p>The instrument shall have two observing modes: 1. Seeing-limited mode   2. IFU mode</p></div><div class="conn solid"></div><div class="card trs"><span class="rid">[R-AND-65].3</span><p>The ANDES Software shall provide support to observing mode in Seeing limited and IFU mode configuration</p></div><div class="conn solid"></div><div class="card trs"><span class="rid">[R-AND-65].3.SW2</span><p>The ANDES DRS software shall be able to reduce data for seeing-limited mode data and IFU mode data</p></div><div class="conn solid stub"></div>
+<div class="card trs"><span class="rid">[R-AND-70]</span><p>The baseline design of ANDES shall cover the wavelength range specified in [R-AND-94]. As a goal, the wavelength range will be extended to U-band and/or K-band.</p></div><div class="conn solid"></div><div class="card trs"><span class="rid">[R-AND-70].1</span><p>The ANDES SW shall be able to support extension of U-band and K-band and tolerate gaps and wavelength extensions.</p></div><div class="conn solid"></div><div class="card trs"><span class="rid">[R-AND-70].1.SW1</span><p>The DRS shall cover reduction procedure in the full wavelength range of ANDES and shall support the extension to U band and K band. The DRS shall be modular to tolerate gaps and further wavelength extensions.</p></div><div class="conn solid stub"></div>
+<div class="card trs"><span class="rid">[R-AND-88]</span><p>Spectral Resolution (TLR-A.1) The instrument shall provide an average spectral resolution of R=100,000 with a variation within [-10%,+30 %] across the wavelength range.</p></div><div class="conn solid"></div><div class="card trs"><span class="rid">[R-AND-88].1</span><p>The ANDES SW shall not degradate the spectral resolution of the recored spectra more than [-5%; +5%] across the wavelength range</p></div><div class="conn dashed"><em>implied</em></div><div class="card trs"><span class="rid">[R-AND-88].1.SW1</span><p>The ANDES DRS shall not degradate the spectral resolution of the recored spectra more than [-5%; +5%] across the wavelength range</p></div><div class="conn solid stub"></div>
+<div class="card trs"><span class="rid">[R-AND-112]</span><p>Validity period of calibrations Except for standard stars, and scientific observations with simultaneous calibrations, night-time calibrations shall not be needed to fulfil the performance requirements defined in this document. All day-time calibrations shall be valid for at least 24 hours (goal: more than 48 hours).</p><span class="note">also linked to SCAO work packages</span></div><div class="conn solid"></div><div class="card trs"><span class="rid">[R-AND-112].1</span><p>The ANDES SW shall not require night-time calibrations to reduce the data and fullfil the requirements on accuracy, precisions, flux calibration and resolution. All day-time calibrations shall be valid for at least 24 hours (goal: more than 48 hours).</p></div><div class="conn solid"></div><div class="card trs"><span class="rid">[R-AND-112].1.SW1</span><p>The ANDES DRS shall not require night-time calibrations to reduce the data and fullfil the requirements on accuracy, precisions, flux calibration and resolution. All day-time calibrations shall be valid for at least 24 hours (goal: more than 48 hours).</p></div><div class="conn solid stub"></div>
+<div class="card trs"><span class="rid">[R-AND-114]</span><p>Sky subtraction For observations in which optimal sky subtraction is requested (i.e. one sub-FoV is serving as a simultaneous sky probe), the sky subtraction shall be better than 1% of the measured sky background or the square root of the number of detected sky photons, whichever is the larger.</p></div><div class="conn solid"></div><div class="card trs"><span class="rid">[R-AND-114].1</span><p>For observations in which optimal sky subtraction is requested (i.e. one sub-FoV is serving as a simultaneous sky probe), the sky subtraction shall be better than 1% of the measured sky background or the square root of the number of detected sky photons, whichever is the larger.</p></div><div class="conn solid"></div><div class="card trs"><span class="rid">[R-AND-114].1.SW1</span><p>For observations in which optimal sky subtraction is requested (i.e. one sub-FoV is serving as a simultaneous sky probe), the sky subtraction obtained by the DRS shall be better than 1% of the measured sky background or the square root of the number of detected sky photons, whichever is the larger.</p></div><div class="conn solid stub"></div>
+<div class="card trs"><span class="rid">[R-AND-115]</span><p>Interpolation When interpolating onto a regular output grid, the data pipeline shall not increase the FWHM of a Nyquist sampled Gaussian by more than 20%.</p></div><div class="conn solid"></div><div class="card trs"><span class="rid">[R-AND-115].1</span><p>The ANDES Data Reduction, when interpolating onto a regular output grid, shall not increase the FWHM of a Nyquist sampled Gaussian by more than 20%.</p></div><div class="conn solid"></div><div class="card trs"><span class="rid">[R-AND-115].1.SW1</span><p>The ANDES Data Reduction, when interpolating onto a regular output grid, shall not increase the FWHM of a Nyquist sampled Gaussian by more than 20%.</p></div><div class="conn solid stub"></div>
+<div class="card trs"><span class="rid">[R-AND-119]</span><p>ANDES shall be fully integrated in the ELT data flow system. Deliverables are specified and described in AD8.</p></div><div class="conn solid"></div><div class="card trs"><span class="rid">[R-AND-119].1</span><p>The ANDES software shall be fully integrated in the ELT data flow system. Deliverables are specified and described in AD8.</p></div><div class="conn solid"></div><div class="card trs"><span class="rid">[R-AND-119].1.SW1</span><p>DRS data product shall be fully compliance with the ELT data flow system as specified in AD-8</p></div><div class="conn solid stub"></div>
+<div class="card trs"><span class="rid">[R-AND-120]</span><p>Data Reduction Software (DRS) The Pipeline shall be compliant with AD8.  The data reduction pipeline shall provide science grade data products for both seeing-limited and IFU modes. The data products, from which the instrument and sky signature has been removed, shall be in physical units and information on signal, error and data quality shall be provided as a minimum. The software shall allow to combine multiple observations to increase the field of view or signal-to-noise.</p></div><div class="conn solid direct"><em>applies directly</em></div>
+<div class="ghead">Common Requirements for ELT Instruments &mdash; ESO standard, local flow-down</div>
+<div class="card ins span3"><span class="rid">[R-INS-896]</span><p>A data reduction package supporting the real-time basic quality control, science-grade pipeline processing, and interactive off-line data reduction, as specified in #898, #1049 and #1050, respectively, shall be developed. All three functions shall be based on the Common Pipeline Library (CPL), HDRL, and Reflex, and support different use cases of the data reduction.</p></div><div class="conn solid span3"></div><div class="card ins span3"><span class="rid">[R-INS-896].1</span><p>The ANDES data reduction package shall support the real-time basic quality control, science-grade pipeline processing, and interactive off-line data reduction, as specified in #898, #1049 and #1050, respectively, shall be developed. All three functions shall be based on the Common Pipeline Library (CPL), HDRL, and Reflex, and support different use cases of the data reduction.</p></div><div class="conn dotted branch btop"><i class="v"></i><i class="ah"></i></div><div class="card ins"><span class="rid">[R-INS-896].1.SW1</span><p>The DRS shall provide algorithms in the reduction cascade to monitor basic quality control to be stored in the FITS header that can be processed during the night for quality control (e.g. RON value, efficiency from standard stars, etc)</p></div><div class="conn solid stub"></div><div class="conn dotted branch bmid"><i class="v"></i><i class="ah"></i></div><div class="card ins"><span class="rid">[R-INS-896].1.SW2</span><p>The DRS shall provide science grade reduction off line interactively</p></div><div class="conn solid stub"></div><div class="conn dotted branch bbot"><i class="v"></i><i class="ah"></i></div><div class="card ins"><span class="rid">[R-INS-896].1.SW3</span><p>All the DRS functionalites (offline reduction science grade, quick reduction for monitoring)  shall be based on the Common Pipeline Library (CPL), HDRL, and Reflex, and support different use cases of the data reduction.</p></div><div class="conn solid stub"></div>
+<div class="card ins"><span class="rid">[R-INS-928]</span><p>Reduced data products produced by the instrument shall conform to the ESO DICD standard, including DFS keywords, and to the ESO Science Data Product Standard for the Phase 3 process as defined in AD8, section 3.1, AD9, and AD10.</p></div><div class="conn solid direct"><em>applies directly</em></div>
+<div class="card ins"><span class="rid">[R-INS-1049]</span><p>The implementation of data reduction Software for science-grade data reduction, generating data compliant with Science Data Product standard for Phase 3 process shall be based on CPL and HDRL as provided by ESO (according to AD8 section 4.7, RD2).</p></div><div class="conn solid direct"><em>applies directly</em></div>
+<div class="card ins"><span class="rid">[R-INS-1050]</span><p>The interactive data reduction system shall allow the data reduction to be adapted to specific data sets, and also to generate data compliant with Science Data Product standard for Phase 3 process. The implementation shall be based on CPL, HDRL and Reflex, as provided by ESO. (according to AD8 section 4.7, RD2).</p></div><div class="conn solid direct"><em>applies directly</em></div>
+<div class="wp">
+  <div class="inner">
+    <p class="wbs">6.WBS / ANDES_WP / SW Sys Eng</p>
+    <h2>SW DRS</h2>
+    <p>Data Reduction Software work package of the ANDES SW subsystem</p>
+    <div class="count">14 requirements linked</div>
+  </div>
+</div>
+</div>
+</div>
+
+<footer>
+  <p><strong>How this was derived.</strong> Requirement&ndash;work-package links are the model's
+  dependencies whose client is the <span class="mono">SW DRS</span> class in
+  <span class="mono">6.WBS</span>. Upward chains follow <span class="mono">DeriveReqt</span>
+  abstractions; for the R-INS-896 flow-down the model nests the SW1&ndash;SW3 requirements inside
+  their parent (shown dotted). One link, <span class="mono">[R-AND-88].1 &rarr; [R-AND-88].1.SW1</span>,
+  has no modeled relationship and is implied by the naming convention only (shown dashed).</p>
+  <p>[R-AND-112] additionally flows down to the SCAO work packages; only the DRS branch is shown here.
+  Requirement texts are quoted verbatim from the model.</p>
+</footer>
