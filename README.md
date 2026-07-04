@@ -8,6 +8,8 @@ SysML model (XMI) without the Cameo software.
   the 14 requirements linked to the SW DRS work package, traced to their source documents
 - [Assessment](drs-flowdown.md) — the requirements verbatim, plus a systems-engineering
   critique of the flow-down and its gaps
+- [Session transcript](https://ivh.github.io/andes-drs-reqs/claude_session1.html) —
+  the Claude Code session in which the model was reverse-engineered and this analysis made
 
 `tools/` holds the extraction scripts; see `CLAUDE.md` for the model's XMI conventions
 and how to rerun the analysis for other work packages. The `.mdzip` model files
