@@ -42,6 +42,9 @@ All have PEP 723 headers, so plain `uv run` works.
    Verify/Satisfy link check for the DRS requirement set; query patterns are reusable.
 6. `uv run tools/gen_viz.py` — turns flowdown.json into the grid cells of
    drs-flowdown.html (row layout is hand-ordered for the DRS analysis).
+7. `uv run tools/merge_transcript.py <transcript-dir> <out.html>` — merges the
+   multi-page output of `uvx claude-code-transcripts` into a single HTML file
+   (localizes anchors, drops pagination).
 
 ## Results so far
 
